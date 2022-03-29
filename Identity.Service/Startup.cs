@@ -32,6 +32,16 @@ namespace Identity.Service
         {
             services.AddControllersWithViews();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .SetIsOriginAllowed(origin => true)
+                        .AllowCredentials());
+            });
+
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -77,7 +87,7 @@ namespace Identity.Service
 
             app.UseIdentityServer();
             app.UseAuthorization();
-
+            app.UseCors("CorsPolicy");
             app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
 
